@@ -13,16 +13,16 @@
             color: #fff;
             width: 85%;
             height: 200rpx;
-            box-shadow: 2rpx 2rpx 20rpx rgba(0,0,0,.3);
+            box-shadow: 2rpx 2rpx 20rpx rgba(0, 0, 0, 0.3);
         }
         .res {
             background: #07c160;
-            background: linear-gradient(to right, #07c160, #09F175);
+            background: linear-gradient(to right, #07c160, #09f175);
             color: #fff;
             border-radius: 50%;
             width: 400rpx;
             height: 400rpx;
-            box-shadow: 2rpx 2rpx 20rpx rgba(0,0,0,.3);
+            box-shadow: 2rpx 2rpx 20rpx rgba(0, 0, 0, 0.3);
         }
     }
 
@@ -45,23 +45,71 @@
             height: 200rpx;
             width: 200rpx;
             border-radius: 50%;
+            .t {
+                height: 100%;
+            }
         }
         &.on {
             opacity: 1;
             transform: translateY(0);
         }
     }
+    &.black {
+        background: url(https://cdn.superwen.cn/halo/db718e90e973b63bde1f853b66259328.jpg) center center no-repeat;
+        background-size: cover;
+        .show,
+        .res {
+            background: #272727e8;
+        }
+        .action {
+            opacity: 0.94;
+            .a {
+                background: #121212e8;
+                background: radial-gradient(#666, #000);
+                color: #fff;
+            }
+        }
+    }
+}
+.selectTheme {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    transition: 0.5s;
+    .item {
+        background: #1989fa;
+        font-size: 20rpx;
+        padding: 10rpx;
+        margin: 10rpx;
+        color: #fff;
+        display: inline-block;
+        width: auto;
+        border-radius: 8rpx;
+        text-align: center;
+        width: 160rpx;
+    }
+    &.hide {
+        opacity: 0;
+        transform: translateX(-20%);
+    }
 }
 </style>
 
 <template lang='pug'>
-.container
+.container(class="{{ [ theme ] }}")
+    .selectTheme(class="{{ [ themeHide ? 'hide' : '' ] }}")
+        .item(v-for='i in themeOptions' :key='i.key' @click='checkTheme(i)') {{i.value}}
     .checkbox
         .show.flex-cc(v-if="!result" v-for="item in show" :key="item.value" @click="click(item)") {{item.value}}
         .res.flex-cc(v-if='result') {{result}}
-    .action.flex-c(class="{{ [ btnShow ? 'on' : '' ] }}")
-        .a.flex-cc(@click='home') 首页
-        .a.flex-cc(@click='back') 上一页
+    .action.flex-c(class="{{ [ btnShow ? 'on' : 'on' ] }}")
+        .a(@click='home')
+            .t.flex-cc 首页
+        .a(@click='back')
+            .t.flex-cc 上一页
 </template>
 
 <script>
@@ -112,7 +160,7 @@ const divorce = [
 ]
 
 wepy.page({
-    onShareAppMessage(){},
+    onShareAppMessage() {},
     data: {
         options: [
             {
@@ -133,11 +181,11 @@ wepy.page({
                                 value: '无北京市工作居住证',
                                 child: [
                                     {
-                                        value: '在京至今缴纳社保满60个月',
+                                        value: '在京至今缴纳社保或纳税满60个月',
                                         allow: 1,
                                     },
                                     {
-                                        value: '在京至今纳税（非0）满60个月',
+                                        value: '在京至今缴纳社保或纳税不满60个月',
                                         allow: 0,
                                     },
                                 ],
@@ -172,6 +220,10 @@ wepy.page({
         show: [],
         result: '',
         prev: [],
+        themeOptions: [{ key: '', value: '简约微信风' }, { key: 'black', value: '五彩斑斓黑' }, { key: 'hide', value: '隐藏' }],
+        theme: '',
+        themeHide: false,
+        toast: false,
     },
 
     computed: {
@@ -181,8 +233,43 @@ wepy.page({
     },
 
     methods: {
+        hideTheme() {
+            this.themeHide = 1
+            if (this.toast) return
+            this.toast = 1
+            wx.showToast({
+                icon: 'none',
+                title: '点击首页可恢复主题选择',
+                duration: 3000,
+            })
+        },
+        checkTheme({ key }) {
+            if (key == 'hide') {
+                this.hideTheme()
+                return
+            }
+            this.theme = key
+            let backgroundColor = '#f5f5f5'
+            let color = '#000000'
+            if (key === 'black') {
+                backgroundColor = '#121212'
+                color = '#ffffff'
+            }
+            // wx.setBackgroundColor({ backgroundColor })
+            wx.setNavigationBarColor({
+                frontColor: color,
+                backgroundColor: backgroundColor,
+                animation: {
+                    duration: 400,
+                    timingFunc: 'easeIn',
+                },
+            })
+
+            this.hideTheme()
+        },
         click({ child, allow, limit }) {
             this.prev.push(this.show)
+            this.hideTheme()
             if (child) {
                 this.show = child
             } else if (!isNaN(allow)) this.result = this.handleAllow(allow)
@@ -194,9 +281,11 @@ wepy.page({
         back() {
             if (this.result) this.result = ''
             if (this.prev[0]) this.show = this.prev.pop()
+            if (this.prev.length === 0) this.themeHide = 0
         },
         home() {
             this.reset()
+            this.themeHide = 0
         },
         reset() {
             this.show = this.options
