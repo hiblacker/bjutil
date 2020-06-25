@@ -17,6 +17,12 @@ module.exports = {
     modules: ['node_modules']
   },
   compilers: {
+    pug: {
+      pretty: false
+    // filename: 'pug',
+    // basedir: path.join(__dirname, 'src'),
+    // prepend: `include /assets/mixins`
+    },
     less: {
       compress: prod
     },

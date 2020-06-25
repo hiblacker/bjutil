@@ -36,6 +36,7 @@
     "wepy-eslint": "^1.5.3",
     "less": "^3.8.1",
     "@wepy/compiler-babel": "^2.0.1",
-    "@wepy/compiler-less": "^2.0.1"
+    "@wepy/compiler-less": "^2.0.1",
+    "@wepy/compiler-pug": "git+https://github.com/Riant/wepy2-compiler-pug.git#master"
   }
 }
