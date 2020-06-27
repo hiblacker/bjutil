@@ -100,12 +100,13 @@
 
 <template lang='pug'>
 .container(class="{{ [ theme ] }}")
-    .selectTheme(class="{{ [ themeHide ? 'hide' : '' ] }}")
-        .item(v-for='i in themeOptions' :key='i.key' @click='checkTheme(i)') {{i.value}}
+    //- .selectTheme(class="{{ [ themeHide ? 'hide' : '' ] }}")
+    //-     .item(v-for='i in themeOptions' :key='i.key' @click='checkTheme(i)') {{i.value}}
     .checkbox
         .show.flex-cc(v-if="!result" v-for="item in show" :key="item.value" @click="click(item)") {{item.value}}
         .res.flex-cc(v-if='result') {{result}}
-    .action.flex-c(class="{{ [ btnShow ? 'on' : 'on' ] }}")
+        official-account
+    .action.flex-c(class="{{ [ btnShow ? 'on' : '' ] }}")
         .a(@click='home')
             .t.flex-cc 首页
         .a(@click='back')
@@ -221,7 +222,7 @@ wepy.page({
         result: '',
         prev: [],
         themeOptions: [{ key: '', value: '简约微信风' }, { key: 'black', value: '五彩斑斓黑' }, { key: 'hide', value: '隐藏' }],
-        theme: '',
+        theme: 'black',
         themeHide: false,
         toast: false,
     },
@@ -237,11 +238,11 @@ wepy.page({
             this.themeHide = 1
             if (this.toast) return
             this.toast = 1
-            wx.showToast({
-                icon: 'none',
-                title: '点击首页可恢复主题选择',
-                duration: 3000,
-            })
+            // wx.showToast({
+            //     icon: 'none',
+            //     title: '点击首页可恢复主题选择',
+            //     duration: 3000,
+            // })
         },
         checkTheme({ key }) {
             if (key == 'hide') {
@@ -302,7 +303,8 @@ wepy.page({
 <config>
 {
     navigationBarTitleText: '自助查询',
-    navigationBarBackgroundColor: '#f5f5f5'
+    navigationBarBackgroundColor: '#121212',
+    navigationBarTextStyle: 'white',
 }
 </config>
 
